@@ -1,200 +1,774 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>오늘 먹을 저녁 메뉴 추천</title>
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>모둠활동 역할 배정 도우미</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800;900&family=Gowun+Dodum&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #FDFCFA;
+    --paper-raised: #FFFFFF;
+    --paper-sunk: #F6F4EE;
+    --ink: #1F1E1B;
+    --ink-soft: #6C685D;
+    --ink-faint: #99958A;
+    --line: #E9E4D9;
+    --line-strong: #D6CFBE;
+    --accent: #3B7A63;
+    --accent-deep: #2C5C4A;
+    --accent-soft: #EDF3EE;
+    --accent-ink: #24503F;
+    --good: #3B7A63;
+    --good-soft: #EDF3EE;
+    --danger: #B8452E;
+    --shadow-sm: 0 1px 2px rgba(31,30,27,0.05);
+    --shadow-md: 0 10px 30px -14px rgba(31,30,27,0.18), 0 2px 6px rgba(31,30,27,0.05);
+    color-scheme: light dark;
+  }
+  :root:not([data-theme="light"]) {
+    @media (prefers-color-scheme: dark) {
+      --paper: #171613;
+      --paper-raised: #1E1D19;
+      --paper-sunk: #201F1A;
+      --ink: #F1EFE8;
+      --ink-soft: #ACA79A;
+      --ink-faint: #7C7869;
+      --line: #2D2B24;
+      --line-strong: #423E33;
+      --accent: #4F9C81;
+      --accent-deep: #6BB89C;
+      --accent-soft: #1E2B25;
+      --accent-ink: #8FD3B7;
+      --good: #4F9C81;
+      --good-soft: #1E2B25;
+      --danger: #D97256;
+      --shadow-sm: 0 1px 2px rgba(0,0,0,0.3);
+      --shadow-md: 0 10px 30px -14px rgba(0,0,0,0.5), 0 2px 6px rgba(0,0,0,0.3);
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper: #171613;
+    --paper-raised: #1E1D19;
+    --paper-sunk: #201F1A;
+    --ink: #F1EFE8;
+    --ink-soft: #ACA79A;
+    --ink-faint: #7C7869;
+    --line: #2D2B24;
+    --line-strong: #423E33;
+    --accent: #4F9C81;
+    --accent-deep: #6BB89C;
+    --accent-soft: #1E2B25;
+    --accent-ink: #8FD3B7;
+    --good: #4F9C81;
+    --good-soft: #1E2B25;
+    --danger: #D97256;
+    --shadow-sm: 0 1px 2px rgba(0,0,0,0.3);
+    --shadow-md: 0 10px 30px -14px rgba(0,0,0,0.5), 0 2px 6px rgba(0,0,0,0.3);
+  }
+  * { box-sizing: border-box; }
+  html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+  body {
+    margin: 0;
+    min-height: 100%;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Noto Sans KR', sans-serif;
+    line-height: 1.65;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  h1, h2, h3 { font-family: 'Gowun Dodum', sans-serif; font-weight: 400; color: var(--ink); letter-spacing: 0; }
+  button { font-family: 'Noto Sans KR', sans-serif; cursor: pointer; }
+  .wrap { max-width: 720px; margin: 0 auto; padding: 52px 22px 80px; }
+  @media (max-width: 480px) { .wrap { padding: 34px 16px 64px; } }
 
-        body {
-            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif;
-            background: linear-gradient(135deg, #fff6ed 0%, #ffefe2 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-            color: #333;
-        }
+  header.top { text-align: center; margin-bottom: 34px; padding-bottom: 30px; border-bottom: 1px solid var(--line); }
+  header.top .kicker { font-family:'JetBrains Mono', monospace; font-size: 0.7rem; color: var(--ink-faint); letter-spacing: 0.12em; margin-bottom: 14px; }
+  header.top h1 { font-size: clamp(1.6rem, 4vw, 2.15rem); margin: 0 0 12px; }
+  header.top p { color: var(--ink-soft); margin: 0; font-size: 0.94rem; }
 
-        .container {
-            background-color: #ffffff;
-            border-radius: 24px;
-            box-shadow: 0 20px 40px rgba(230, 100, 50, 0.08);
-            padding: 40px 30px;
-            width: 100%;
-            max-width: 480px;
-            text-align: center;
-            border: 1px solid rgba(255, 230, 210, 0.6);
-        }
+  /* progress dots */
+  .progress { display: flex; justify-content: center; gap: 10px; margin: 0 0 40px; }
+  .progress .dot { display:flex; align-items:center; gap:9px; }
+  .progress .circ {
+    width: 27px; height: 27px; border-radius: 50%;
+    background: var(--paper-raised); border: 1px solid var(--line-strong);
+    color: var(--ink-faint);
+    font-family:'Gowun Dodum', sans-serif; font-weight: 400; font-size: 0.82rem;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .progress .label { font-size: 0.78rem; color: var(--ink-faint); }
+  .progress .dot.active .circ { background: var(--accent); border-color: var(--accent); color: white; box-shadow: 0 0 0 4px var(--accent-soft); }
+  .progress .dot.active .label { color: var(--ink); font-weight: 700; }
+  .progress .dot.done .circ { background: var(--paper-raised); border-color: var(--accent); color: var(--accent); }
+  .progress .bar { width: 24px; height: 1px; background: var(--line-strong); margin-top: 13px; }
 
-        .header h1 {
-            font-size: 26px;
-            color: #2c2c2c;
-            margin-bottom: 8px;
-            font-weight: 800;
-        }
+  .card { background: var(--paper-raised); border: 1px solid var(--line); border-radius: 14px; padding: 30px; box-shadow: var(--shadow-md); }
+  @media (max-width: 480px) { .card { padding: 20px; } }
 
-        .header p {
-            font-size: 15px;
-            color: #777;
-            margin-bottom: 30px;
-        }
+  label.field-label { display:block; font-size: 0.85rem; font-weight: 700; color: var(--ink); margin-bottom: 8px; letter-spacing: 0.01em; }
+  input[type=text], textarea, select {
+    width: 100%; font-family: 'Noto Sans KR', sans-serif; font-size: 0.94rem;
+    padding: 11px 13px; border-radius: 8px; border: 1px solid var(--line-strong);
+    background: var(--paper-sunk); color: var(--ink);
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  }
+  input[type=text]:focus, textarea:focus, select:focus {
+    outline: none; border-color: var(--accent); background: var(--paper-raised);
+    box-shadow: 0 0 0 3px var(--accent-soft);
+  }
+  textarea { resize: vertical; min-height: 64px; }
 
-        .display-card {
-            background-color: #fffbf7;
-            border: 2px dashed #ffd8be;
-            border-radius: 20px;
-            padding: 35px 20px;
-            margin-bottom: 30px;
-            min-height: 220px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            transition: all 0.3s ease;
-        }
+  .member-row { display: flex; gap: 8px; margin-bottom: 10px; align-items: center; }
+  .member-row input { flex: 1; }
+  .member-row .num { font-family:'Gowun Dodum', sans-serif; font-size: 0.82rem; color: var(--ink-faint); width: 20px; }
+  .icon-btn {
+    border: 1px solid var(--line-strong); background: var(--paper-raised); color: var(--ink-faint);
+    width: 32px; height: 32px; border-radius: 8px; font-size: 1rem; line-height:1;
+    display:flex; align-items:center; justify-content:center; transition: all 0.15s ease;
+  }
+  .icon-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
+  .icon-btn:disabled { opacity: 0.35; cursor: not-allowed; }
 
-        .emoji-display {
-            font-size: 90px;
-            line-height: 1.1;
-            margin-bottom: 15px;
-            filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.1));
-            user-select: none;
-        }
+  .add-row-btn {
+    margin-top: 6px; background: none; border: 1px dashed var(--line-strong); color: var(--ink-soft);
+    padding: 10px 14px; border-radius: 8px; font-size: 0.86rem; width: 100%; transition: all 0.15s ease;
+  }
+  .add-row-btn:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); border-style: solid; }
+  .add-row-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
-        .menu-name {
-            font-size: 24px;
-            font-weight: 700;
-            color: #ff5722;
-            height: 32px;
-        }
+  .error-text { color: var(--danger); font-size: 0.84rem; margin-top: 12px; min-height: 1.2em; }
 
-        .menu-category {
-            font-size: 13px;
-            color: #999;
-            margin-top: 4px;
-            height: 18px;
-        }
+  .btn-row { display: flex; gap: 10px; margin-top: 28px; justify-content: flex-end; flex-wrap: wrap; }
+  .btn {
+    padding: 12px 22px; border-radius: 8px; border: none; font-size: 0.92rem; font-weight: 700;
+    letter-spacing: 0.01em; transition: all 0.15s ease;
+  }
+  .btn.primary { background: var(--accent); color: white; box-shadow: 0 1px 2px rgba(0,0,0,0.08), 0 6px 16px -8px var(--accent); }
+  .btn.primary:hover { background: var(--accent-deep); transform: translateY(-1px); }
+  .btn.ghost { background: transparent; color: var(--ink-soft); border: 1px solid var(--line-strong); }
+  .btn.ghost:hover { color: var(--ink); border-color: var(--ink-soft); }
+  .btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
-        .btn-recommend {
-            background: linear-gradient(135deg, #ff6b4a 0%, #ff4500 100%);
-            color: white;
-            border: none;
-            border-radius: 50px;
-            padding: 16px 36px;
-            font-size: 18px;
-            font-weight: 700;
-            cursor: pointer;
-            box-shadow: 0 8px 20px rgba(255, 69, 0, 0.3);
-            transition: all 0.2s ease;
-            width: 100%;
-            outline: none;
-        }
+  /* step 2 tabs */
+  .member-tabs { display: flex; gap: 6px; overflow-x: auto; margin-bottom: 24px; padding-bottom: 6px; }
+  .member-tab {
+    flex: none; padding: 8px 15px; border-radius: 8px; border: 1px solid var(--line-strong);
+    background: var(--paper-raised); color: var(--ink-soft); font-size: 0.86rem; white-space: nowrap;
+    transition: all 0.15s ease;
+  }
+  .member-tab.active { background: var(--ink); border-color: var(--ink); color: var(--paper); }
+  .member-tab .ok { color: var(--good); margin-right: 4px; }
+  .member-tab.active .ok { color: #7FDABA; }
 
-        .btn-recommend:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 24px rgba(255, 69, 0, 0.4);
-        }
+  .chip-wrap { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
+  .chip {
+    padding: 7px 14px; border-radius: 8px; border: 1px solid var(--line-strong);
+    background: var(--paper-sunk); color: var(--ink-soft); font-size: 0.84rem; transition: all 0.15s ease;
+  }
+  .chip.selected { background: var(--accent-soft); border-color: var(--accent); color: var(--accent-ink); font-weight: 700; }
 
-        .btn-recommend:active {
-            transform: translateY(1px);
-            box-shadow: 0 4px 12px rgba(255, 69, 0, 0.3);
-        }
+  .field-block { margin-bottom: 20px; }
+  .hint { font-size: 0.78rem; color: var(--ink-faint); margin-top: 6px; }
 
-        .rolling {
-            animation: bounce 0.1s infinite alternate;
-        }
+  /* step 3 results */
+  .result-top { display:flex; justify-content: space-between; align-items:center; gap:12px; margin-bottom: 22px; flex-wrap: wrap; }
+  .result-top h2 { margin: 0; font-size: 1.35rem; }
+  .progress-track { margin-bottom: 18px; }
+  .progress-track-top { display: flex; justify-content: space-between; font-size: 0.82rem; color: var(--ink-soft); margin-bottom: 7px; }
+  .progress-track-top span:last-child { font-weight: 700; color: var(--accent-ink); }
+  .progress-bar-bg { height: 8px; border-radius: 999px; background: var(--paper-sunk); border: 1px solid var(--line); overflow: hidden; }
+  .progress-bar-fill { height: 100%; width: 0%; background: var(--accent); border-radius: 999px; transition: width 0.25s ease; }
 
-        @keyframes bounce {
-            0% { transform: scale(0.95); }
-            100% { transform: scale(1.05); }
-        }
-    </style>
+  .tips-box { border: 1px solid var(--line); border-radius: 12px; padding: 4px 20px; margin-bottom: 22px; background: var(--paper-raised); }
+  .tips-box summary { padding: 14px 0; font-weight: 700; font-size: 0.94rem; color: var(--ink); cursor: pointer; list-style: none; display: flex; align-items: center; gap: 8px; }
+  .tips-box summary::before { content: "💬"; font-size: 0.95rem; }
+  .tips-box summary::-webkit-details-marker { display: none; }
+  .tips-box summary::after { content: "▾"; margin-left: auto; color: var(--ink-faint); transition: transform 0.15s ease; }
+  .tips-box[open] summary::after { transform: rotate(180deg); }
+  .tips-box ul { margin: 0; padding: 0 0 16px; list-style: none; display: flex; flex-direction: column; gap: 12px; border-top: 1px solid var(--line); padding-top: 14px; }
+  .tips-box li { font-size: 0.87rem; color: var(--ink-soft); line-height: 1.6; }
+  .tips-box li strong { color: var(--ink); }
+
+  .swap-banner {
+    background: var(--paper-sunk); border: 1px solid var(--line-strong);
+    color: var(--ink-soft); padding: 11px 15px; border-radius: 9px; font-size: 0.86rem; margin-bottom: 18px; display:none;
+  }
+  .swap-banner.show { display: block; }
+  .swap-banner::before { content: "↔ "; color: var(--accent); font-weight: 700; }
+
+  .roster { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 16px; margin-bottom: 26px; }
+  .role-card {
+    background: var(--paper-raised); border: 1px solid var(--line);
+    border-radius: 12px; padding: 20px; cursor: default; box-shadow: var(--shadow-sm);
+    transition: box-shadow 0.18s ease, border-color 0.18s ease, transform 0.18s ease;
+  }
+  .role-card.swap-mode { cursor: pointer; }
+  .role-card.swap-mode:hover { box-shadow: var(--shadow-md); border-color: var(--accent); transform: translateY(-2px); }
+  .role-card.selected-for-swap { box-shadow: 0 0 0 2px var(--accent); border-color: var(--accent); }
+  .role-card .top-line { display:flex; justify-content: space-between; align-items:flex-start; }
+  .role-card .icon {
+    font-size: 1.1rem; width: 40px; height: 40px; border-radius: 50%;
+    background: var(--paper-raised); border: 1px solid var(--line-strong);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .role-card .manual-badge { font-size: 0.68rem; font-family:'JetBrains Mono',monospace; color: var(--accent-ink); border:1px solid var(--accent); background: var(--accent-soft); padding: 1px 6px; border-radius: 6px; }
+  .role-card .name { font-size: 0.85rem; color: var(--ink-faint); margin: 12px 0 2px; }
+  .role-card h4 { margin: 0 0 10px; font-size: 1.12rem; }
+  .role-card .reason { font-size: 0.85rem; color: var(--ink-soft); margin: 0 0 14px; line-height: 1.55; }
+  .role-card .checklist { list-style: none; margin: 0; padding: 14px 0 0; border-top: 1px solid var(--line); display: flex; flex-direction: column; gap: 8px; }
+  .role-card .checklist li { display: flex; gap: 9px; align-items: flex-start; font-size: 0.86rem; }
+  .role-card .checklist input { margin-top: 3px; accent-color: var(--good); }
+  .role-card .checklist span.done { text-decoration: line-through; color: var(--ink-faint); opacity: 0.8; }
+
+  .copy-toast {
+    position: fixed; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); left: 50%; transform: translateX(-50%);
+    background: var(--ink); color: var(--paper); padding: 11px 20px; border-radius: 999px;
+    font-size: 0.84rem; opacity: 0; pointer-events: none; transition: opacity 0.2s ease; box-shadow: var(--shadow-md);
+  }
+  .copy-toast.show { opacity: 1; }
+
+  footer.note { text-align:center; margin-top: 40px; color: var(--ink-faint); font-size: 0.78rem; }
+
+  .step-panel { display: none; }
+  .step-panel.active { display: block; }
+</style>
 </head>
 <body>
+<div class="wrap">
+  <header class="top">
+    <div class="kicker">GROUP PROJECT · ROLE MATCHER</div>
+    <h1>모둠활동 역할 배정 도우미</h1>
+    <p>이름과 성향을 입력하면, 모둠원마다 잘 맞는 역할을 배정해드려요.</p>
+  </header>
 
-    <div class="container">
-        <div class="header">
-            <h1>🍴 오늘 뭐 먹지?</h1>
-            <p>오늘 저녁 메뉴가 고민된다면 버튼을 눌러보세요!</p>
-        </div>
+  <div class="progress" id="progress"></div>
 
-        <div class="display-card" id="card">
-            <div class="emoji-display" id="emoji">❓</div>
-            <div class="menu-name" id="menuName">버튼을 눌러주세요</div>
-            <div class="menu-category" id="menuCategory">무엇이 나올까요?</div>
-        </div>
-
-        <button class="btn-recommend" onclick="recommendMenu()">저녁 메뉴 추천 🎲</button>
+  <!-- Step 1: 모둠 정보 -->
+  <section class="step-panel" id="panel-1">
+    <div class="card">
+      <div class="field-block">
+        <label class="field-label" for="groupName">모둠(활동) 이름</label>
+        <input type="text" id="groupName" placeholder="예: 사회 3모둠 - 지역 문제 탐구">
+      </div>
+      <label class="field-label">모둠원 (2~6명)</label>
+      <div id="memberRows"></div>
+      <button class="add-row-btn" id="addMemberBtn" type="button">+ 모둠원 추가</button>
+      <div class="error-text" id="step1Error"></div>
+      <div class="btn-row">
+        <button class="btn primary" id="toStep2Btn" type="button">다음 — 성향 입력하기</button>
+      </div>
     </div>
+  </section>
 
-    <script>
-        const menuList = [
-            { name: "삼겹살", emoji: "🥓", category: "한식" },
-            { name: "치킨", emoji: "🍗", category: "야식/분식" },
-            { name: "피자", emoji: "🍕", category: "양식" },
-            { name: "초밥", emoji: "🍣", category: "일식" },
-            { name: "짜장면 & 탕수육", emoji: "🍜", category: "중식" },
-            { name: "떡볶이", emoji: "🍢", category: "분식" },
-            { name: "햄버거", emoji: "🍔", category: "패스트푸드" },
-            { name: "파스타", emoji: "🍝", category: "양식" },
-            { name: "김치찌개", emoji: "🍲", category: "한식" },
-            { name: "부대찌개", emoji: "🥘", category: "한식" },
-            { name: "족발/보쌈", emoji: "🍖", category: "한식" },
-            { name: "쌀국수", emoji: "🍜", category: "아시안" },
-            { name: "마라탕", emoji: "🍲", category: "중식" },
-            { name: "돈까스", emoji: "🍱", category: "일식/양식" },
-            { name: "타코/퀘사디아", emoji: "🌮", category: "아시안/양식" },
-            { name: "스테이크", emoji: "🥩", category: "양식" },
-            { name: "곱창/막창", emoji: "🫕", category: "한식" },
-            { name: "수제비/칼국수", emoji: "🥣", category: "한식" },
-            { name: "카레", emoji: "🍛", category: "일식/아시안" },
-            { name: "샌드위치/샐러드", emoji: "🥗", category: "가벼운 식사" }
-        ];
+  <!-- Step 2: 성향 입력 -->
+  <section class="step-panel" id="panel-2">
+    <div class="card">
+      <div class="member-tabs" id="memberTabs"></div>
+      <div id="memberForm"></div>
+      <div class="error-text" id="step2Error"></div>
+      <div class="btn-row">
+        <button class="btn ghost" id="toStep1Btn" type="button">이전</button>
+        <button class="btn primary" id="toStep3Btn" type="button">역할 배정하기</button>
+      </div>
+    </div>
+  </section>
 
-        let isRolling = false;
+  <!-- Step 3: 결과 -->
+  <section class="step-panel" id="panel-3">
+    <div class="result-top">
+      <h2 id="resultGroupName">배정 결과</h2>
+      <div class="btn-row" style="margin:0;">
+        <button class="btn ghost" id="swapModeBtn" type="button">역할 바꾸기</button>
+        <button class="btn ghost" id="reassignBtn" type="button">다시 배정</button>
+        <button class="btn primary" id="copyResultBtn" type="button">결과 복사</button>
+      </div>
+    </div>
+    <div class="progress-track" id="progressTrack">
+      <div class="progress-track-top"><span>체크리스트 진행률</span><span id="progressPercent">0%</span></div>
+      <div class="progress-bar-bg"><div class="progress-bar-fill" id="progressFill"></div></div>
+    </div>
+    <div class="swap-banner" id="swapBanner">바꾸고 싶은 모둠원 카드 두 개를 순서대로 눌러주세요.</div>
+    <div class="roster" id="roster"></div>
+    <details class="tips-box">
+      <summary>역할을 안 지키는 친구가 있다면?</summary>
+      <ul>
+        <li><strong>사실부터 확인하기</strong> — "왜 안 했어?" 보다 "이 부분 아직 안 끝났네, 오늘 중으로 가능해?"처럼 상황을 먼저 물어보세요.</li>
+        <li><strong>역할을 다시 짚어주기</strong> — 가끔은 뭘 해야 할지 헷갈려서 못 하는 경우도 있어요. 이 화면의 체크리스트를 같이 보면서 확인해보세요.</li>
+        <li><strong>혼자 참지 말고 모둠 전체와 이야기하기</strong> — 한 사람한테만 계속 말하기보다, 다 같이 모여서 진행 상황을 점검하는 시간을 가져보세요.</li>
+        <li><strong>그래도 안 풀리면 선생님께 미리 알리기</strong> — 마감 직전이 아니라 문제가 보이는 시점에 미리 이야기하면 훨씬 도움이 돼요.</li>
+      </ul>
+    </details>
+    <div class="btn-row" style="justify-content: flex-start;">
+      <button class="btn ghost" id="toStep2FromResultBtn" type="button">성향 다시 입력하기</button>
+      <button class="btn ghost" id="restartBtn" type="button">처음부터 다시</button>
+    </div>
+  </section>
 
-        function recommendMenu() {
-            if (isRolling) return;
-            isRolling = true;
+  <footer class="note">입력한 내용은 이 브라우저에만 저장돼요. 다른 사람에게는 보이지 않아요.</footer>
+</div>
+<div class="copy-toast" id="copyToast">결과를 복사했어요</div>
 
-            const emojiEl = document.getElementById("emoji");
-            const nameEl = document.getElementById("menuName");
-            const categoryEl = document.getElementById("menuCategory");
-            
-            let count = 0;
-            const maxCount = 15;
-            
-            emojiEl.classList.add("rolling");
+<script>
+(function () {
+  "use strict";
 
-            const interval = setInterval(() => {
-                const tempIndex = Math.floor(Math.random() * menuList.length);
-                emojiEl.textContent = menuList[tempIndex].emoji;
-                nameEl.textContent = menuList[tempIndex].name;
-                categoryEl.textContent = menuList[tempIndex].category;
-                
-                count++;
-                if (count >= maxCount) {
-                    clearInterval(interval);
-                    
-                    const finalIndex = Math.floor(Math.random() * menuList.length);
-                    const selected = menuList[finalIndex];
-                    
-                    emojiEl.textContent = selected.emoji;
-                    nameEl.textContent = selected.name;
-                    categoryEl.textContent = `[${selected.category}] 오늘 저녁은 이거다!`;
-                    
-                    emojiEl.classList.remove("rolling");
-                    isRolling = false;
-                }
-            }, 80);
-        }
-    </script>
+  var STORAGE_KEY = "groupRoleAssignment_v1";
+
+  var TRAIT_TAGS = [
+    "리더십 있음", "꼼꼼함", "창의적", "적극적", "조용한 편",
+    "책임감 강함", "말하기 좋아함", "계획적", "호기심 많음", "분석적", "자신감 있음"
+  ];
+
+  var ROLES = [
+    { id: "leader", name: "팀장 / 진행", icon: "🧭",
+      traits: ["리더십 있음", "책임감 강함", "적극적"],
+      tasks: ["활동 방향 정하기", "역할별 진행 상황 확인하기", "선생님과 소통하기"] },
+    { id: "writer", name: "기록 / 서기", icon: "📝",
+      traits: ["꼼꼼함", "계획적"],
+      tasks: ["회의 내용 기록하기", "결정 사항 정리하기", "제출 문서 취합하기"] },
+    { id: "researcher", name: "자료 조사", icon: "🔍",
+      traits: ["호기심 많음", "분석적", "조용한 편"],
+      tasks: ["주제 관련 자료 모으기", "출처 정리하기", "핵심 내용 요약하기"] },
+    { id: "presenter", name: "발표", icon: "🎤",
+      traits: ["말하기 좋아함", "적극적", "자신감 있음"],
+      tasks: ["발표 대본 준비하기", "발표 진행하기", "질문에 답하기"] },
+    { id: "designer", name: "디자인 / 편집", icon: "🎨",
+      traits: ["창의적"],
+      tasks: ["발표 자료 디자인하기", "결과물 편집하기", "시각 자료 만들기"] },
+    { id: "scheduler", name: "일정 관리", icon: "⏰",
+      traits: ["계획적", "책임감 강함"],
+      tasks: ["일정표 관리하기", "중간 점검 알리기", "마감 리마인드하기"] }
+  ];
+
+  var state = {
+    step: 1,
+    groupName: "",
+    members: [],       // {id, name, traits:[], strength:"", preferredRoleId:null}
+    assignments: [],   // {memberId, roleId, reason, manual:false, checked:[bool,bool,bool]}
+    activeMemberIndex: 0,
+    swapMode: false,
+    swapPick: null
+  };
+
+  function uid() { return "m" + Math.random().toString(36).slice(2, 9); }
+
+  function save() {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) { /* storage unavailable */ }
+  }
+
+  function load() {
+    try {
+      var raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return false;
+      var parsed = JSON.parse(raw);
+      if (parsed && Array.isArray(parsed.members)) {
+        state = Object.assign(state, parsed);
+        return true;
+      }
+    } catch (e) { /* ignore corrupt data */ }
+    return false;
+  }
+
+  function ensureMinMembers() {
+    while (state.members.length < 2) {
+      state.members.push({ id: uid(), name: "", traits: [], strength: "", preferredRoleId: null });
+    }
+  }
+
+  // ---------- Progress ----------
+  function renderProgress() {
+    var labels = ["모둠 정보", "성향 입력", "결과 확인"];
+    var el = document.getElementById("progress");
+    var html = "";
+    for (var i = 0; i < 3; i++) {
+      var n = i + 1;
+      var cls = "dot" + (state.step === n ? " active" : (state.step > n ? " done" : ""));
+      html += '<div class="' + cls + '"><div class="circ">' + (state.step > n ? "✓" : n) + '</div><span class="label">' + labels[i] + "</span></div>";
+      if (i < 2) html += '<div class="bar"></div>';
+    }
+    el.innerHTML = html;
+  }
+
+  function showStep(n) {
+    state.step = n;
+    document.getElementById("panel-1").classList.toggle("active", n === 1);
+    document.getElementById("panel-2").classList.toggle("active", n === 2);
+    document.getElementById("panel-3").classList.toggle("active", n === 3);
+    renderProgress();
+    save();
+  }
+
+  // ---------- Step 1 ----------
+  function renderStep1() {
+    ensureMinMembers();
+    document.getElementById("groupName").value = state.groupName || "";
+    var rows = document.getElementById("memberRows");
+    rows.innerHTML = "";
+    state.members.forEach(function (m, i) {
+      var row = document.createElement("div");
+      row.className = "member-row";
+      row.innerHTML =
+        '<span class="num">' + (i + 1) + '</span>' +
+        '<input type="text" data-idx="' + i + '" placeholder="모둠원 이름" value="' + escapeAttr(m.name) + '">' +
+        '<button type="button" class="icon-btn" data-remove="' + i + '" ' + (state.members.length <= 2 ? "disabled" : "") + '>✕</button>';
+      rows.appendChild(row);
+    });
+    document.getElementById("addMemberBtn").disabled = state.members.length >= 6;
+    document.getElementById("step1Error").textContent = "";
+  }
+
+  function escapeAttr(s) {
+    return String(s || "").replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
+  }
+
+  document.getElementById("memberRows").addEventListener("input", function (e) {
+    var idx = e.target.getAttribute("data-idx");
+    if (idx !== null) {
+      state.members[idx].name = e.target.value;
+      save();
+    }
+  });
+  document.getElementById("memberRows").addEventListener("click", function (e) {
+    var idx = e.target.getAttribute("data-remove");
+    if (idx !== null && state.members.length > 2) {
+      state.members.splice(idx, 1);
+      renderStep1();
+      save();
+    }
+  });
+  document.getElementById("addMemberBtn").addEventListener("click", function () {
+    if (state.members.length < 6) {
+      state.members.push({ id: uid(), name: "", traits: [], strength: "", preferredRoleId: null });
+      renderStep1();
+      save();
+    }
+  });
+  document.getElementById("groupName").addEventListener("input", function (e) {
+    state.groupName = e.target.value;
+    save();
+  });
+
+  document.getElementById("toStep2Btn").addEventListener("click", function () {
+    var names = state.members.map(function (m) { return (m.name || "").trim(); });
+    var errEl = document.getElementById("step1Error");
+    if (names.some(function (n) { return !n; })) {
+      errEl.textContent = "모든 모둠원의 이름을 입력해주세요.";
+      return;
+    }
+    var seen = {};
+    for (var i = 0; i < names.length; i++) {
+      if (seen[names[i]]) {
+        errEl.textContent = "모둠원 이름이 중복돼요: " + names[i];
+        return;
+      }
+      seen[names[i]] = true;
+    }
+    errEl.textContent = "";
+    state.members.forEach(function (m, i) { m.name = names[i]; });
+    state.activeMemberIndex = 0;
+    save();
+    renderStep2();
+    showStep(2);
+  });
+
+  // ---------- Step 2 ----------
+  function renderStep2() {
+    var tabs = document.getElementById("memberTabs");
+    tabs.innerHTML = "";
+    state.members.forEach(function (m, i) {
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "member-tab" + (i === state.activeMemberIndex ? " active" : "");
+      btn.innerHTML = (m.traits.length > 0 ? '<span class="ok">●</span>' : "") + escapeAttr(m.name || "모둠원 " + (i + 1));
+      btn.addEventListener("click", function () {
+        state.activeMemberIndex = i;
+        renderStep2();
+      });
+      tabs.appendChild(btn);
+    });
+    renderMemberForm();
+  }
+
+  function renderMemberForm() {
+    var i = state.activeMemberIndex;
+    var m = state.members[i];
+    var container = document.getElementById("memberForm");
+
+    var chipsHtml = TRAIT_TAGS.map(function (t) {
+      var selected = m.traits.indexOf(t) !== -1;
+      return '<button type="button" class="chip' + (selected ? " selected" : "") + '" data-trait="' + escapeAttr(t) + '">' + t + "</button>";
+    }).join("");
+
+    var roleOptionsHtml = '<option value="">없음 (선택 안 함)</option>' + ROLES.map(function (r) {
+      return '<option value="' + r.id + '"' + (m.preferredRoleId === r.id ? " selected" : "") + '>' + r.icon + " " + r.name + "</option>";
+    }).join("");
+
+    container.innerHTML =
+      '<div class="field-block">' +
+        '<label class="field-label">' + escapeAttr(m.name) + '의 성격 (여러 개 선택 가능)</label>' +
+        '<div class="chip-wrap" id="chipWrap">' + chipsHtml + '</div>' +
+        '<div class="hint">가장 잘 어울리는 태그를 1개 이상 골라주세요.</div>' +
+      '</div>' +
+      '<div class="field-block">' +
+        '<label class="field-label" for="strengthInput">잘하는 것 / 좋아하는 것 (선택)</label>' +
+        '<textarea id="strengthInput" placeholder="예: 발표할 때 떨지 않고 편하게 말하는 편이에요">' + escapeAttr(m.strength) + '</textarea>' +
+      '</div>' +
+      '<div class="field-block">' +
+        '<label class="field-label" for="preferredRoleSelect">하고 싶은 역할 (선택)</label>' +
+        '<select id="preferredRoleSelect">' + roleOptionsHtml + '</select>' +
+      '</div>';
+
+    document.getElementById("chipWrap").addEventListener("click", function (e) {
+      var trait = e.target.getAttribute("data-trait");
+      if (!trait) return;
+      var idx = m.traits.indexOf(trait);
+      if (idx === -1) m.traits.push(trait); else m.traits.splice(idx, 1);
+      save();
+      renderStep2();
+    });
+    document.getElementById("strengthInput").addEventListener("input", function (e) {
+      m.strength = e.target.value;
+      save();
+    });
+    document.getElementById("preferredRoleSelect").addEventListener("change", function (e) {
+      m.preferredRoleId = e.target.value || null;
+      save();
+    });
+  }
+
+  document.getElementById("toStep1Btn").addEventListener("click", function () {
+    showStep(1);
+    renderStep1();
+  });
+
+  document.getElementById("toStep3Btn").addEventListener("click", function () {
+    var missing = state.members.filter(function (m) { return m.traits.length === 0; });
+    var errEl = document.getElementById("step2Error");
+    if (missing.length > 0) {
+      errEl.textContent = missing.map(function (m) { return m.name; }).join(", ") + " 모둠원의 성격 태그를 1개 이상 선택해주세요.";
+      return;
+    }
+    errEl.textContent = "";
+    assignRoles();
+    showStep(3);
+    renderStep3();
+  });
+
+  // ---------- Assignment logic ----------
+  function computeScore(member, role) {
+    var overlap = role.traits.filter(function (t) { return member.traits.indexOf(t) !== -1; }).length;
+    var score = overlap * 2;
+    if (member.preferredRoleId === role.id) score += 3;
+    score += Math.random() * 0.01; // tiny tie-breaker so "다시 배정" can vary
+    return score;
+  }
+
+  function buildReason(member, role, manual) {
+    if (manual) {
+      return "직접 바꾼 역할이에요. " + member.name + "님과 잘 맞는지 함께 확인해보세요.";
+    }
+    var matched = role.traits.filter(function (t) { return member.traits.indexOf(t) !== -1; });
+    var preferredNote = member.preferredRoleId === role.id ? " 본인이 원했던 역할이기도 해요." : "";
+    if (matched.length > 0) {
+      return matched.join(", ") + " 성향이 있어서 이 역할과 잘 어울려요." + preferredNote;
+    }
+    return "다른 모둠원들과 역할을 고르게 나누다 보니 배정된 역할이에요." + preferredNote;
+  }
+
+  function assignRoles() {
+    var pairs = [];
+    state.members.forEach(function (m) {
+      ROLES.forEach(function (r) {
+        pairs.push({ memberId: m.id, roleId: r.id, score: computeScore(m, r) });
+      });
+    });
+    pairs.sort(function (a, b) { return b.score - a.score; });
+
+    var takenMember = {};
+    var takenRole = {};
+    var results = [];
+    pairs.forEach(function (p) {
+      if (takenMember[p.memberId] || takenRole[p.roleId]) return;
+      takenMember[p.memberId] = true;
+      takenRole[p.roleId] = true;
+      results.push(p);
+    });
+
+    state.assignments = results.map(function (p) {
+      var member = state.members.filter(function (m) { return m.id === p.memberId; })[0];
+      var role = ROLES.filter(function (r) { return r.id === p.roleId; })[0];
+      return {
+        memberId: p.memberId,
+        roleId: p.roleId,
+        reason: buildReason(member, role, false),
+        manual: false,
+        checked: [false, false, false]
+      };
+    });
+    state.swapMode = false;
+    state.swapPick = null;
+    save();
+  }
+
+  // ---------- Step 3 ----------
+  function renderStep3() {
+    document.getElementById("resultGroupName").textContent = (state.groupName || "우리 모둠") + " · 배정 결과";
+    var roster = document.getElementById("roster");
+    roster.innerHTML = "";
+
+    var totalTasks = 0;
+    var doneTasks = 0;
+
+    state.assignments.forEach(function (a, idx) {
+      var member = state.members.filter(function (m) { return m.id === a.memberId; })[0];
+      var role = ROLES.filter(function (r) { return r.id === a.roleId; })[0];
+      if (!member || !role) return;
+
+      var card = document.createElement("div");
+      card.className = "role-card" + (state.swapMode ? " swap-mode" : "") + (state.swapPick === a.memberId ? " selected-for-swap" : "");
+      card.setAttribute("data-member", a.memberId);
+
+      var checklistHtml = role.tasks.map(function (task, ti) {
+        var checked = a.checked && a.checked[ti];
+        totalTasks++;
+        if (checked) doneTasks++;
+        return '<li><input type="checkbox" data-member="' + a.memberId + '" data-task="' + ti + '" ' + (checked ? "checked" : "") + '>' +
+          '<span class="' + (checked ? "done" : "") + '">' + task + "</span></li>";
+      }).join("");
+
+      card.innerHTML =
+        '<div class="top-line"><span class="icon">' + role.icon + '</span>' + (a.manual ? '<span class="manual-badge">직접 변경</span>' : '') + '</div>' +
+        '<div class="name">' + escapeAttr(member.name) + '</div>' +
+        '<h4>' + role.name + '</h4>' +
+        '<p class="reason">' + a.reason + '</p>' +
+        '<ul class="checklist">' + checklistHtml + '</ul>';
+
+      roster.appendChild(card);
+    });
+
+    var percent = totalTasks > 0 ? Math.round((doneTasks / totalTasks) * 100) : 0;
+    document.getElementById("progressPercent").textContent = percent + "%";
+    document.getElementById("progressFill").style.width = percent + "%";
+
+    document.getElementById("swapBanner").classList.toggle("show", state.swapMode);
+    document.getElementById("swapModeBtn").textContent = state.swapMode ? "바꾸기 취소" : "역할 바꾸기";
+  }
+
+  document.getElementById("roster").addEventListener("click", function (e) {
+    var checkbox = e.target.closest("input[type=checkbox]");
+    if (checkbox) {
+      var mid = checkbox.getAttribute("data-member");
+      var ti = parseInt(checkbox.getAttribute("data-task"), 10);
+      var a = state.assignments.filter(function (x) { return x.memberId === mid; })[0];
+      if (a) {
+        a.checked[ti] = checkbox.checked;
+        save();
+        renderStep3();
+      }
+      return;
+    }
+
+    if (!state.swapMode) return;
+    var card = e.target.closest(".role-card");
+    if (!card) return;
+    var memberId = card.getAttribute("data-member");
+
+    if (!state.swapPick) {
+      state.swapPick = memberId;
+      renderStep3();
+      return;
+    }
+    if (state.swapPick === memberId) {
+      state.swapPick = null;
+      renderStep3();
+      return;
+    }
+    var a1 = state.assignments.filter(function (x) { return x.memberId === state.swapPick; })[0];
+    var a2 = state.assignments.filter(function (x) { return x.memberId === memberId; })[0];
+    if (a1 && a2) {
+      var tmpRole = a1.roleId;
+      a1.roleId = a2.roleId;
+      a2.roleId = tmpRole;
+      var m1 = state.members.filter(function (m) { return m.id === a1.memberId; })[0];
+      var m2 = state.members.filter(function (m) { return m.id === a2.memberId; })[0];
+      var r1 = ROLES.filter(function (r) { return r.id === a1.roleId; })[0];
+      var r2 = ROLES.filter(function (r) { return r.id === a2.roleId; })[0];
+      a1.reason = buildReason(m1, r1, true);
+      a2.reason = buildReason(m2, r2, true);
+      a1.manual = true;
+      a2.manual = true;
+      a1.checked = [false, false, false];
+      a2.checked = [false, false, false];
+    }
+    state.swapPick = null;
+    state.swapMode = false;
+    save();
+    renderStep3();
+  });
+
+  document.getElementById("swapModeBtn").addEventListener("click", function () {
+    state.swapMode = !state.swapMode;
+    state.swapPick = null;
+    renderStep3();
+  });
+
+  document.getElementById("reassignBtn").addEventListener("click", function () {
+    assignRoles();
+    renderStep3();
+  });
+
+  document.getElementById("toStep2FromResultBtn").addEventListener("click", function () {
+    state.activeMemberIndex = 0;
+    showStep(2);
+    renderStep2();
+  });
+
+  document.getElementById("restartBtn").addEventListener("click", function () {
+    if (!confirm("입력한 내용을 모두 지우고 처음부터 다시 시작할까요?")) return;
+    state = { step: 1, groupName: "", members: [], assignments: [], activeMemberIndex: 0, swapMode: false, swapPick: null };
+    ensureMinMembers();
+    save();
+    renderStep1();
+    showStep(1);
+  });
+
+  document.getElementById("copyResultBtn").addEventListener("click", function () {
+    var lines = [(state.groupName || "우리 모둠") + " 역할 배정 결과", ""];
+    state.assignments.forEach(function (a) {
+      var member = state.members.filter(function (m) { return m.id === a.memberId; })[0];
+      var role = ROLES.filter(function (r) { return r.id === a.roleId; })[0];
+      if (!member || !role) return;
+      lines.push(member.name + " — " + role.icon + " " + role.name);
+      role.tasks.forEach(function (t) { lines.push("  · " + t); });
+      lines.push("");
+    });
+    var text = lines.join("\n");
+    var toast = document.getElementById("copyToast");
+    function showToast(msg) {
+      toast.textContent = msg;
+      toast.classList.add("show");
+      setTimeout(function () { toast.classList.remove("show"); }, 1600);
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function () { showToast("결과를 복사했어요"); })
+        .catch(function () { showToast("복사에 실패했어요"); });
+    } else {
+      showToast("이 브라우저에서는 복사를 지원하지 않아요");
+    }
+  });
+
+  // ---------- Init ----------
+  var restored = load();
+  ensureMinMembers();
+  renderStep1();
+  if (restored && state.step === 2) renderStep2();
+  if (restored && state.step === 3 && state.assignments.length > 0) renderStep3();
+  showStep(restored ? state.step : 1);
+})();
+</script>
 </body>
 </html>
